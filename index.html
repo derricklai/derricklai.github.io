@@ -1,8 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="favicon/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="favicon/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="favicon/favicon-16x16.png"
+    />
+    <link rel="manifest" href="favicon/site.webmanifest" />
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta property="og:image" content="thumbnail.jpg" />
+    <meta name="twitter:image" content="thumbnail.jpg" />
+
     <title>Timer</title>
     <style>
       @keyframes fadeInUp {
@@ -266,7 +289,6 @@
         text-align: center; /* Center the text */
         padding: 5px; /* Small padding around the text */
         font-size: 0.75rem; /* Tiny font size */
-        box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.3); /* Optional: Add a subtle shadow */
         animation: fadeOut 1s forwards; /* Fade out animation after 1 second */
         animation-delay: 1s; /* Delay the animation by 1 second */
       }
