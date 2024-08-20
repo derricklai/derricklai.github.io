@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Stopwatch</title>
+    <title>Timer</title>
     <style>
       @keyframes fadeInUp {
         0% {
@@ -22,6 +22,16 @@
         }
         to {
           opacity: 1; /* End fully opaque */
+        }
+      }
+
+      /* Keyframes for fade-out animation */
+      @keyframes fadeOut {
+        0% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
         }
       }
 
@@ -238,11 +248,27 @@
         background-size: cover; /* Ensure the image covers the overlay */
         pointer-events: none; /* Allow clicks to pass through */
         opacity: 0.2; /* Change this to 1 for testing */
+        animation: fadeIn 1s backwards; /* Apply fade-in animation */
       }
 
       .overlay,
       .vhs-effect {
         z-index: 10; /* Ensure it's on top */
+      }
+
+      footer {
+        position: fixed; /* Fix the footer to the bottom */
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: transparent; /* No background color */
+        color: #777; /* Grey text color */
+        text-align: center; /* Center the text */
+        padding: 5px; /* Small padding around the text */
+        font-size: 0.75rem; /* Tiny font size */
+        box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.3); /* Optional: Add a subtle shadow */
+        animation: fadeOut 1s forwards; /* Fade out animation after 1 second */
+        animation-delay: 1s; /* Delay the animation by 1 second */
       }
     </style>
   </head>
@@ -289,6 +315,11 @@
         </button>
       </div>
     </div>
+
+    <footer class="footer">
+      <p>humanadderall © 2024</p>
+    </footer>
+
     <script>
       const startButton = document.getElementById("start");
       const resetButton = document.getElementById("reset");
