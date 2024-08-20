@@ -16,6 +16,15 @@
         }
       }
 
+      @keyframes fadeIn {
+        from {
+          opacity: 0; /* Start fully transparent */
+        }
+        to {
+          opacity: 1; /* End fully opaque */
+        }
+      }
+
       body {
         font-family: Meiryo, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* Apply Meiryo font with fallbacks */
         display: flex;
@@ -193,10 +202,65 @@
       .glass-button:hover {
         background-color: rgba(255, 255, 255, 0.2);
       }
+
+      .youtube-player {
+        position: absolute; /* Position the player absolutely */
+        top: 2%; /* Position it at the top */
+        left: 50%; /* Move it to the center horizontally */
+        transform: translateX(-50%); /* Adjust to center it */
+        overflow: hidden; /* Hide overflow */
+        border: 2px solid rgba(255, 255, 255, 0.223); /* Add a white border */
+        border-radius: 15px; /* Make the border round */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Optional: Add a shadow for depth */
+        opacity: 0;
+        animation: fadeIn 1s forwards; /* Apply fade-in animation */
+      }
+
+      .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6); /* Dark overlay */
+        border-radius: 15px;
+        pointer-events: none; /* Allow clicks to pass through */
+        box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2); /* Subtle inner glow */
+      }
+
+      .vhs-effect {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("vhs-texture.gif") no-repeat center center; /* Replace with your VHS texture image */
+        background-size: cover; /* Ensure the image covers the overlay */
+        pointer-events: none; /* Allow clicks to pass through */
+        opacity: 0.2; /* Change this to 1 for testing */
+      }
+
+      .overlay,
+      .vhs-effect {
+        z-index: 10; /* Ensure it's on top */
+      }
     </style>
   </head>
   <body class="light-mode">
     <div class="container">
+      <div class="youtube-player">
+        <iframe
+          src="https://www.youtube.com/embed/videoseries?list=PLJMIraKgxXLJW0dpr82oAFKx7Hmd9FXal&autoplay=1&loop=1&controls=0"
+          frameborder="0"
+          allow="autoplay; encrypted-media"
+          allowfullscreen
+        >
+        </iframe>
+
+        <div class="overlay"></div>
+        <div class="vhs-effect"></div>
+      </div>
+
       <div class="title-container">
         <div class="title">
           <span class="title-text" contenteditable="true">Editable Title</span>
@@ -390,6 +454,8 @@
         initializeTitle(); // Initialize title from localStorage
         initializeDarkMode(); // Initialize dark mode from localStorage
       });
+
+      document.querySelector(".youtube-player").style.opacity = 1; // Ensure player is visible
     </script>
   </body>
 </html>
