@@ -3,8 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
     <title>Stopwatch</title>
     <style>
+      @keyframes fadeInUp {
+        0% {
+          transform: translateY(20px); /* Start slightly lower */
+          opacity: 0; /* Start invisible */
+        }
+        100% {
+          transform: translateY(0); /* End at original position */
+          opacity: 1; /* End fully visible */
+        }
+      }
+
       body {
         font-family: Meiryo, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* Apply Meiryo font with fallbacks */
         display: flex;
@@ -33,6 +46,7 @@
         display: inline-block;
         font-size: 2rem;
         margin-bottom: 80px; /* Space between title and timer */
+        animation: fadeInUp 1.5s ease forwards; /* Apply the animation */
       }
 
       .title {
@@ -46,6 +60,7 @@
         padding: 10px;
         box-sizing: border-box;
         text-align: center; /* Center title text */
+        opacity: 0; /* Start hidden */
         transition: opacity 1s ease-in-out; /* Fade transition */
       }
 
@@ -76,8 +91,10 @@
       }
 
       .timer {
+        opacity: 0; /* Start hidden */
         font-size: 4rem; /* Size for "00" */
         margin-bottom: 20px; /* Space between timer and labels */
+        animation: fadeInUp 1.5s ease 0.2s forwards; /* Apply the animation */
       }
 
       .timer div {
@@ -93,9 +110,11 @@
       }
 
       .labels {
+        opacity: 0; /* Start hidden */
         display: flex;
         justify-content: center;
         margin-bottom: 50px; /* Space between labels and buttons */
+        animation: fadeInUp 1.5s ease 0.2s forwards; /* Apply the animation */
       }
 
       .labels span {
@@ -165,6 +184,17 @@
         background-color: white;
         color: black;
       }
+
+      .glass-button {
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(30px);
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .glass-button:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
     </style>
   </head>
   <body class="light-mode">
@@ -189,15 +219,28 @@
         <span>SECONDS</span>
       </div>
       <div class="buttons">
-        <button id="start" class="light-mode">Start</button>
-        <button id="reset" class="light-mode">Reset</button>
-        <button id="toggle-dark-mode" class="dark-mode-toggle">
+        <button id="start" class="glass-button light-mode">Start</button>
+        <button id="reset" class="glass-button light-mode">Reset</button>
+        <button id="toggle-dark-mode" class="glass-button dark-mode-toggle">
           <span class="icon">🌑</span>
           <!-- Black moon icon -->
         </button>
       </div>
     </div>
     <script>
+      const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+        databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT_ID.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID",
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const database = firebase.database();
+
       const startButton = document.getElementById("start");
       const resetButton = document.getElementById("reset");
       const toggleDarkModeButton = document.getElementById("toggle-dark-mode");
