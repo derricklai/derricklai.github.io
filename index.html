@@ -1,28 +1,367 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stopwatch</title>
+    <style>
+      body {
+        font-family: Meiryo, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* Apply Meiryo font with fallbacks */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        transition: background-color 0.5s, color 0.5s;
+        opacity: 0; /* Start hidden */
+        transform: translateY(20px); /* Start from below */
+        transition: opacity 1s ease-in-out, transform 1s ease-in-out; /* Fade-in and slide-up transition */
+      }
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.min.css">
-    <title>Derrick Lai</title>
-</head>
+      body.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
 
-<body>
+      .container {
+        text-align: center;
+      }
 
-    <div class="countdown-container">
-        <div id="countdown"></div>
+      .title-container {
+        position: relative;
+        display: inline-block;
+        font-size: 2rem;
+        margin-bottom: 80px; /* Space between title and timer */
+      }
+
+      .title {
+        position: relative;
+        font-size: 2rem;
+        margin: 0;
+        border: none;
+        background: none;
+        outline: none;
+        color: inherit;
+        padding: 10px;
+        box-sizing: border-box;
+        text-align: center; /* Center title text */
+        transition: opacity 1s ease-in-out; /* Fade transition */
+      }
+
+      .title::before {
+        content: "【";
+        position: absolute;
+        left: -2.5rem; /* Adjust to position closely around the first letter */
+        top: 50%;
+        transform: translateY(-50%); /* Center vertically */
+        color: inherit;
+        font-size: 2rem; /* Match title size */
+      }
+
+      .title::after {
+        content: "】";
+        position: absolute;
+        right: -2.5rem; /* Adjust to position closely around the last letter */
+        top: 50%;
+        transform: translateY(-50%); /* Center vertically */
+        color: inherit;
+        font-size: 2rem; /* Match title size */
+      }
+
+      .title-text {
+        display: inline-block;
+        position: relative;
+        top: -2px; /* Float title text 2px above */
+      }
+
+      .timer {
+        font-size: 4rem; /* Size for "00" */
+        margin-bottom: 20px; /* Space between timer and labels */
+      }
+
+      .timer div {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end; /* Align numbers to the bottom */
+      }
+
+      .timer div span {
+        margin: 0 50px; /* Space between numbers */
+        font-size: 4rem; /* Size of "00" */
+        width: 4rem; /* Match width of "00" */
+      }
+
+      .labels {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 50px; /* Space between labels and buttons */
+      }
+
+      .labels span {
+        margin: 0 50px; /* Space between labels */
+        display: block;
+        width: 4rem; /* Match width of "00" */
+        font-size: 1.2rem; /* 30% of "00" size */
+        text-align: center; /* Center the labels */
+        text-transform: uppercase;
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: center; /* Center buttons horizontally */
+        gap: 50px; /* Space between buttons */
+        margin-top: 100px; /* Space between labels and buttons */
+        opacity: 0; /* Start hidden */
+        transition: opacity 1s ease-in-out; /* Fade transition */
+      }
+
+      button {
+        font-size: 1rem;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: background-color 0.5s, color 0.5s;
+      }
+
+      .dark-mode-toggle {
+        font-size: 1.5rem;
+        padding: 8px;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        background-color: inherit;
+        color: inherit;
+        border: none; /* Remove border */
+      }
+
+      .dark-mode-toggle .icon {
+        font-size: 1.5rem; /* Adjust icon size */
+      }
+
+      /* Initial light mode */
+      body.light-mode {
+        background-color: white;
+        color: black;
+      }
+
+      button.light-mode {
+        background-color: black;
+        color: white;
+      }
+
+      /* Dark mode */
+      body.dark-mode {
+        background-color: black;
+        color: white;
+      }
+
+      button.dark-mode {
+        background-color: white;
+        color: black;
+      }
+    </style>
+  </head>
+  <body class="light-mode">
+    <div class="container">
+      <div class="title-container">
+        <div class="title">
+          <span class="title-text" contenteditable="true">Editable Title</span>
+        </div>
+      </div>
+      <div class="timer">
+        <div>
+          <span id="days">00</span>
+          <span id="hours">00</span>
+          <span id="minutes">00</span>
+          <span id="seconds">00</span>
+        </div>
+      </div>
+      <div class="labels">
+        <span>DAYS</span>
+        <span>HOURS</span>
+        <span>MINUTES</span>
+        <span>SECONDS</span>
+      </div>
+      <div class="buttons">
+        <button id="start" class="light-mode">Start</button>
+        <button id="reset" class="light-mode">Reset</button>
+        <button id="toggle-dark-mode" class="dark-mode-toggle">
+          <span class="icon">🌑</span>
+          <!-- Black moon icon -->
+        </button>
+      </div>
     </div>
+    <script>
+      const startButton = document.getElementById("start");
+      const resetButton = document.getElementById("reset");
+      const toggleDarkModeButton = document.getElementById("toggle-dark-mode");
+      const daysElement = document.getElementById("days");
+      const hoursElement = document.getElementById("hours");
+      const minutesElement = document.getElementById("minutes");
+      const secondsElement = document.getElementById("seconds");
+      const titleElement = document.querySelector(".title-text");
+      const title = document.querySelector(".title");
+      const buttons = document.querySelector(".buttons");
+      let timerInterval;
+      let startTime;
+      let elapsedTime = 0;
+      let fadeTimeout;
 
-    <div class="egg-container">
-        <img id="egg" src="seed.png" width="10%" alt="Seed" />
-    </div>
+      function updateDisplay() {
+        // No automatic switching, only manual dark mode toggle
+      }
 
-    <footer>
-        <p>&copy; 2024 All Rights Reserved | Derrick Lai</p>
-    </footer>
+      function formatTime(ms) {
+        const totalSeconds = Math.floor(ms / 1000);
+        const days = Math.floor(totalSeconds / (3600 * 24));
+        const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        return { days, hours, minutes, seconds };
+      }
 
-    <script src="countdown.js"></script>
-</body>
+      function updateTimer() {
+        if (startTime) {
+          elapsedTime = Date.now() - startTime;
+          const time = formatTime(elapsedTime);
+          daysElement.textContent = String(time.days).padStart(2, "0");
+          hoursElement.textContent = String(time.hours).padStart(2, "0");
+          minutesElement.textContent = String(time.minutes).padStart(2, "0");
+          secondsElement.textContent = String(time.seconds).padStart(2, "0");
 
+          // Save the state in localStorage
+          localStorage.setItem("elapsedTime", elapsedTime);
+          localStorage.setItem("startTime", startTime);
+        }
+      }
+
+      function startTimer() {
+        startTime = Date.now() - elapsedTime;
+        timerInterval = setInterval(updateTimer, 1000);
+      }
+
+      function resetTimer() {
+        clearInterval(timerInterval);
+        timerInterval = null; // Ensure timer is cleared
+        startTime = null;
+        elapsedTime = 0;
+        daysElement.textContent = "00";
+        hoursElement.textContent = "00";
+        minutesElement.textContent = "00";
+        secondsElement.textContent = "00";
+
+        // Clear the saved state
+        localStorage.removeItem("elapsedTime");
+        localStorage.removeItem("startTime");
+      }
+
+      function initializeTimer() {
+        const savedElapsedTime = localStorage.getItem("elapsedTime");
+        const savedStartTime = localStorage.getItem("startTime");
+        if (savedElapsedTime && savedStartTime) {
+          startTime = parseInt(savedStartTime);
+          elapsedTime = parseInt(savedElapsedTime);
+          startTimer();
+        }
+      }
+
+      function initializeTitle() {
+        const savedTitle = localStorage.getItem("title");
+        if (savedTitle) {
+          titleElement.textContent = savedTitle;
+        }
+      }
+
+      function saveTitle() {
+        localStorage.setItem("title", titleElement.textContent);
+      }
+
+      function toggleDarkMode() {
+        const isDarkMode = document.body.classList.toggle("dark-mode");
+        document.body.classList.toggle("light-mode", !isDarkMode);
+        startButton.classList.toggle("dark-mode", isDarkMode);
+        resetButton.classList.toggle("dark-mode", isDarkMode);
+        toggleDarkModeButton.classList.toggle("dark-mode", isDarkMode);
+        toggleDarkModeButton.classList.toggle("light-mode", !isDarkMode);
+
+        // Save the dark mode state
+        localStorage.setItem("darkMode", isDarkMode ? "true" : "false");
+      }
+
+      function initializeDarkMode() {
+        const darkMode = localStorage.getItem("darkMode") === "true";
+        if (darkMode) {
+          document.body.classList.add("dark-mode");
+          document.body.classList.remove("light-mode");
+          startButton.classList.add("dark-mode");
+          resetButton.classList.add("dark-mode");
+          toggleDarkModeButton.classList.add("dark-mode");
+          toggleDarkModeButton.classList.remove("light-mode");
+        } else {
+          document.body.classList.add("light-mode");
+          document.body.classList.remove("dark-mode");
+          startButton.classList.add("light-mode");
+          resetButton.classList.add("light-mode");
+          toggleDarkModeButton.classList.add("light-mode");
+          toggleDarkModeButton.classList.remove("dark-mode");
+        }
+      }
+
+      function showElements() {
+        document.body.classList.add("visible");
+      }
+
+      function startFadeTimeout() {
+        clearTimeout(fadeTimeout);
+        fadeTimeout = setTimeout(() => {
+          title.style.opacity = "0.02";
+          titleElement.style.opacity = "0.4";
+          buttons.style.opacity = "0";
+        }, 2000); // 10 seconds
+      }
+
+      function resetFadeTimeout() {
+        clearTimeout(fadeTimeout);
+        title.style.opacity = "1";
+        titleElement.style.opacity = "1";
+        buttons.style.opacity = "1";
+        startFadeTimeout(); // Restart the fade-out timeout
+      }
+
+      startButton.addEventListener("click", () => {
+        if (!timerInterval) {
+          startTimer();
+        }
+        resetFadeTimeout();
+      });
+
+      resetButton.addEventListener("click", () => {
+        resetTimer();
+        resetFadeTimeout();
+      });
+
+      toggleDarkModeButton.addEventListener("click", () => {
+        toggleDarkMode();
+        resetFadeTimeout();
+      });
+
+      titleElement.addEventListener("input", saveTitle);
+
+      document.addEventListener("mousemove", resetFadeTimeout);
+      document.addEventListener("keydown", resetFadeTimeout);
+
+      document.addEventListener("DOMContentLoaded", () => {
+        showElements(); // Trigger initial animations
+        initializeTimer(); // Initialize timer display and state
+        initializeTitle(); // Initialize title from localStorage
+        initializeDarkMode(); // Initialize dark mode from localStorage
+      });
+    </script>
+  </body>
 </html>
